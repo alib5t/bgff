@@ -1,0 +1,21 @@
+workflows:
+  flutter-build:
+    name: Flutter Build (APK + iOS .app)
+
+    environment:
+      flutter: stable
+      xcode: latest
+
+    scripts:
+      - name: Get dependencies
+        script: flutter pub get
+
+      - name: Build Android APK
+        script: flutter build apk --release
+
+      - name: Build iOS (no sign)
+        script: flutter build ios --release --no-codesign
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/ios/iphoneos/Runner.app
