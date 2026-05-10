@@ -15,6 +15,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      routes: {
+        "/home": (context) => const MainApp(),
+      },
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       home: const Root(),

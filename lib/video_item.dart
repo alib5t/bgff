@@ -19,35 +19,40 @@ class _VideoItemState extends State<VideoItem> {
   late VideoPlayerController controller;
   bool initialized = false;
 
-  @override
-  void initState() {
-    super.initState();
+@override
+void initState() {
+  super.initState();
 
-    // 📌 asset video yükle
-    controller = VideoPlayerController.asset(widget.path)
-      ..initialize().then((_) {
-        setState(() {
-          initialized = true;
-        });
+  controller = VideoPlayerController.asset(widget.path);
 
-        // aktifse oynat
-        if (widget.isActive) {
-          controller.play();
-        }
-      });
-  }
+  controller.initialize().then((_) async {
 
-  @override
-  void didUpdateWidget(covariant VideoItem oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    await controller.setLooping(true);
 
-    // 📌 sadece görünen video çalışır
     if (widget.isActive) {
-      controller.play();
-    } else {
-      controller.pause();
+      await controller.play();
     }
+
+    if (mounted) {
+      setState(() {
+        initialized = true;
+      });
+    }
+  });
+}
+
+@override
+void didUpdateWidget(covariant VideoItem oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (!initialized) return;
+
+  if (widget.isActive) {
+    controller.play();
+  } else {
+    controller.pause();
   }
+}
 
   void togglePlay() {
     setState(() {
@@ -78,7 +83,7 @@ class _VideoItemState extends State<VideoItem> {
                   fit: BoxFit.cover,
                   child: SizedBox(
                     width: controller.value.size.width,
-                    height: controller.value.size.height,
+                    height: controller.value.size.height
                     child: VideoPlayer(controller),
                   ),
                 )
