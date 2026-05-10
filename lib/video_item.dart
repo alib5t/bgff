@@ -19,40 +19,39 @@ class _VideoItemState extends State<VideoItem> {
   late VideoPlayerController controller;
   bool initialized = false;
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  controller = VideoPlayerController.asset(widget.path);
+    controller = VideoPlayerController.asset(widget.path);
 
-  controller.initialize().then((_) async {
+    controller.initialize().then((_) async {
+      await controller.setLooping(true);
 
-    await controller.setLooping(true);
+      if (widget.isActive) {
+        await controller.play();
+      }
+
+      if (mounted) {
+        setState(() {
+          initialized = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant VideoItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!initialized) return;
 
     if (widget.isActive) {
-      await controller.play();
+      controller.play();
+    } else {
+      controller.pause();
     }
-
-    if (mounted) {
-      setState(() {
-        initialized = true;
-      });
-    }
-  });
-}
-
-@override
-void didUpdateWidget(covariant VideoItem oldWidget) {
-  super.didUpdateWidget(oldWidget);
-
-  if (!initialized) return;
-
-  if (widget.isActive) {
-    controller.play();
-  } else {
-    controller.pause();
   }
-}
 
   void togglePlay() {
     setState(() {
@@ -73,7 +72,7 @@ void didUpdateWidget(covariant VideoItem oldWidget) {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: togglePlay, // 📌 dokun → dur / devam
+      onTap: togglePlay,
 
       child: Container(
         color: Colors.black,
@@ -83,7 +82,7 @@ void didUpdateWidget(covariant VideoItem oldWidget) {
                   fit: BoxFit.cover,
                   child: SizedBox(
                     width: controller.value.size.width,
-                    height: controller.value.size.height
+                    height: controller.value.size.height, // ✅ düzeltildi
                     child: VideoPlayer(controller),
                   ),
                 )
