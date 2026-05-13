@@ -17,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // 📸 FOTO SEÇ
   Future<void> pickImage() async {
-    var status = await Permission.photos.request();
+    var status = await Permission.storage.request();
     if (!status.isGranted) return;
 
     final file = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -71,11 +71,12 @@ Future<void> saveAndEnter() async {
                 radius: 60,
                 backgroundImage: imagePath != null
                     ? FileImage(File(imagePath!))
-                    : const AssetImage("assets/images/default_profile.png")
-                        as ImageProvider,
+                    : const AssetImage(
+                        "assets/images/default_profile.png",
+                      ) as ImageProvider,
               ),
             ),
-
+            
             const SizedBox(height: 30),
 
             // 🔹 İSİM ALANI
