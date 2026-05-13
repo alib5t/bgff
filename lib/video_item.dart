@@ -19,27 +19,9 @@ class _VideoItemState extends State<VideoItem> {
   late VideoPlayerController controller;
   bool initialized = false;
 
-@override
-void initState() {
-  super.initState();
-
-  c = VideoPlayerController.asset(widget.path);
-
-  c.initialize().then((_) async {
-
-    await c.setLooping(true);
-
-    if (widget.isActive) {
-      await c.play();
-    }
-
-    if (mounted) {
-      setState(() {
-        ready = true;
-      });
-    }
-  });
-}
+  @override
+  void initState() {
+    super.initState();
 
     controller = VideoPlayerController.asset(widget.path);
 
@@ -91,7 +73,6 @@ void initState() {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: togglePlay,
-
       child: Container(
         color: Colors.black,
         child: Center(
@@ -100,7 +81,7 @@ void initState() {
                   fit: BoxFit.cover,
                   child: SizedBox(
                     width: controller.value.size.width,
-                    height: controller.value.size.height, // ✅ düzeltildi
+                    height: controller.value.size.height,
                     child: VideoPlayer(controller),
                   ),
                 )
