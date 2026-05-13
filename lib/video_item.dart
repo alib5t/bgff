@@ -19,9 +19,27 @@ class _VideoItemState extends State<VideoItem> {
   late VideoPlayerController controller;
   bool initialized = false;
 
-  @override
-  void initState() {
-    super.initState();
+@override
+void initState() {
+  super.initState();
+
+  c = VideoPlayerController.asset(widget.path);
+
+  c.initialize().then((_) async {
+
+    await c.setLooping(true);
+
+    if (widget.isActive) {
+      await c.play();
+    }
+
+    if (mounted) {
+      setState(() {
+        ready = true;
+      });
+    }
+  });
+}
 
     controller = VideoPlayerController.asset(widget.path);
 
