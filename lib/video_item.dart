@@ -17,6 +17,7 @@ class VideoItem extends StatefulWidget {
 
 class _VideoItemState extends State<VideoItem> {
   late VideoPlayerController controller;
+
   bool initialized = false;
 
   @override
@@ -26,6 +27,7 @@ class _VideoItemState extends State<VideoItem> {
     controller = VideoPlayerController.asset(widget.path);
 
     controller.initialize().then((_) async {
+
       await controller.setLooping(true);
 
       if (widget.isActive) {
@@ -54,6 +56,9 @@ class _VideoItemState extends State<VideoItem> {
   }
 
   void togglePlay() {
+
+    if (!initialized) return;
+
     setState(() {
       if (controller.value.isPlaying) {
         controller.pause();
@@ -71,21 +76,29 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (!initialized) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return GestureDetector(
       onTap: togglePlay,
       child: Container(
         color: Colors.black,
-        child: Center(
-          child: initialized
-              ? FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: controller.value.size.width,
-                    height: controller.value.size.height,
-                    child: VideoPlayer(controller),
-                  ),
-                )
-              : const CircularProgressIndicator(),
+        width: double.infinity,
+        height: double.infinity,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: controller.value.size.width,
+            height: controller.value.size.height,
+            child: VideoPlayer(controller),
+          ),
         ),
       ),
     );
