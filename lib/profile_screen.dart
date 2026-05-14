@@ -32,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   pickImage() async {
-    var status = await Permission.photos.request();
+    var status = await Permission.storage.request();
     if (!status.isGranted) return;
 
     final file = await ImagePicker().pickImage(source: ImageSource.gallery);
