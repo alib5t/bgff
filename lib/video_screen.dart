@@ -9,9 +9,9 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoScreenState extends State<VideoScreen> {
-  final PageController controller = PageController();
 
-  // 📌 SIRALI 1 → 60 VİDEO
+  late final PageController controller;
+
   final List<String> videos = List.generate(
     60,
     (i) => "assets/videos/${i + 1}.mp4",
@@ -20,15 +20,31 @@ class _VideoScreenState extends State<VideoScreen> {
   int currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    controller = PageController(
+      initialPage: 0,
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.black,
+
       body: PageView.builder(
         controller: controller,
         scrollDirection: Axis.vertical,
         itemCount: videos.length,
 
-        // 📌 hangi video ekranda
         onPageChanged: (index) {
           setState(() {
             currentIndex = index;
@@ -36,9 +52,10 @@ class _VideoScreenState extends State<VideoScreen> {
         },
 
         itemBuilder: (context, index) {
+
           return VideoItem(
             path: videos[index],
-            isActive: index == currentIndex, // 🔥 sadece bu oynar
+            isActive: currentIndex == index,
           );
         },
       ),
