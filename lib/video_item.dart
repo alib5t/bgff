@@ -1,5 +1,5 @@
+import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class VideoItem extends StatefulWidget {
   final String path;
@@ -16,39 +16,38 @@ class VideoItem extends StatefulWidget {
 }
 
 class _VideoItemState extends State<VideoItem> {
-  late VideoPlayerController controller;
-
-  bool initialized = false;
+  late BetterPlayerController controller;
 
   @override
   void initState() {
     super.initState();
 
-    controller = VideoPlayerController.contentUri(
-      Uri.parse("asset:///${widget.path}"),
+    controller = BetterPlayerController(
+      const BetterPlayerConfiguration(
+        autoPlay: false,
+        looping: true,
+        fit: BoxFit.cover,
+        controlsConfiguration: BetterPlayerControlsConfiguration(
+          showControls: false,
+        ),
+      ),
     );
 
-    controller.initialize().then((_) async {
+    controller.setupDataSource(
+      BetterPlayerDataSource(
+        BetterPlayerDataSourceType.asset,
+        widget.path,
+      ),
+    );
 
-      await controller.setLooping(true);
-
-      if (widget.isActive) {
-        await controller.play();
-      }
-
-      if (mounted) {
-        setState(() {
-          initialized = true;
-        });
-      }
-    });
+    if (widget.isActive) {
+      controller.play();
+    }
   }
 
   @override
   void didUpdateWidget(covariant VideoItem oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (!initialized) return;
 
     if (widget.isActive) {
       controller.play();
@@ -58,16 +57,13 @@ class _VideoItemState extends State<VideoItem> {
   }
 
   void togglePlay() {
+    if (controller.isPlaying() == true) {
+      controller.pause();
+    } else {
+      controller.play();
+    }
 
-    if (!initialized) return;
-
-    setState(() {
-      if (controller.value.isPlaying) {
-        controller.pause();
-      } else {
-        controller.play();
-      }
-    });
+    setState(() {});
   }
 
   @override
@@ -78,29 +74,14 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
-
-    if (!initialized) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return GestureDetector(
       onTap: togglePlay,
       child: Container(
         color: Colors.black,
         width: double.infinity,
         height: double.infinity,
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: controller.value.size.width,
-            height: controller.value.size.height,
-            child: VideoPlayer(controller),
-          ),
+        child: BetterPlayer(
+          controller: controller,
         ),
       ),
     );
