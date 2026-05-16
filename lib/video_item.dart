@@ -1,5 +1,6 @@
-import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class VideoItem extends StatefulWidget {
   final String path;
@@ -16,33 +17,24 @@ class VideoItem extends StatefulWidget {
 }
 
 class _VideoItemState extends State<VideoItem> {
-  late BetterPlayerController controller;
+
+  late final Player player;
+  late final VideoController controller;
 
   @override
   void initState() {
     super.initState();
 
-    controller = BetterPlayerController(
-      const BetterPlayerConfiguration(
-        autoPlay: false,
-        looping: true,
-        fit: BoxFit.cover,
-        controlsConfiguration: BetterPlayerControlsConfiguration(
-          showControls: false,
-        ),
-      ),
+    player = Player();
+
+    controller = VideoController(player);
+
+    player.open(
+      Media(widget.path),
+      play: widget.isActive,
     );
 
-    controller.setupDataSource(
-      BetterPlayerDataSource(
-        BetterPlayerDataSourceType.asset,
-        widget.path,
-      ),
-    );
-
-    if (widget.isActive) {
-      controller.play();
-    }
+    player.setPlaylistMode(PlaylistMode.loop);
   }
 
   @override
@@ -50,17 +42,17 @@ class _VideoItemState extends State<VideoItem> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.isActive) {
-      controller.play();
+      player.play();
     } else {
-      controller.pause();
+      player.pause();
     }
   }
 
-  void togglePlay() {
-    if (controller.isPlaying() == true) {
-      controller.pause();
+  void toggle() {
+    if (player.state.playing) {
+      player.pause();
     } else {
-      controller.play();
+      player.play();
     }
 
     setState(() {});
@@ -68,20 +60,22 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   void dispose() {
-    controller.dispose();
+    player.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return GestureDetector(
-      onTap: togglePlay,
+      onTap: toggle,
       child: Container(
         color: Colors.black,
         width: double.infinity,
         height: double.infinity,
-        child: BetterPlayer(
+        child: Video(
           controller: controller,
+          fit: BoxFit.cover,
         ),
       ),
     );
