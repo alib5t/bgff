@@ -5,6 +5,7 @@ import 'login_screen.dart';
 import 'main_app.dart';
 
 void main() {
+  MediaKit.ensureInitialized();
   runApp(const MyApp());
 }
 
