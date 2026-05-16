@@ -24,7 +24,9 @@ class _VideoItemState extends State<VideoItem> {
   void initState() {
     super.initState();
 
-    controller = VideoPlayerController.asset(widget.path);
+    controller = VideoPlayerController.contentUri(
+      Uri.parse("asset:///${widget.path}"),
+    );
 
     controller.initialize().then((_) async {
 
