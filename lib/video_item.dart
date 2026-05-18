@@ -21,6 +21,8 @@ class _VideoItemState extends State<VideoItem> {
   late final Player player;
   late final VideoController controller;
 
+  bool initialized = false;
+
   @override
   void initState() {
     super.initState();
@@ -31,15 +33,30 @@ class _VideoItemState extends State<VideoItem> {
 
     player.open(
       Media(widget.path),
-      play: widget.isActive,
+      play: false,
     );
 
     player.setPlaylistMode(PlaylistMode.loop);
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+
+      if (!mounted) return;
+
+      setState(() {
+        initialized = true;
+      });
+
+      if (widget.isActive) {
+        player.play();
+      }
+    });
   }
 
   @override
   void didUpdateWidget(covariant VideoItem oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (!initialized) return;
 
     if (widget.isActive) {
       player.play();
@@ -48,7 +65,8 @@ class _VideoItemState extends State<VideoItem> {
     }
   }
 
-  void toggle() {
+  void togglePause() {
+
     if (player.state.playing) {
       player.pause();
     } else {
@@ -67,15 +85,27 @@ class _VideoItemState extends State<VideoItem> {
   @override
   Widget build(BuildContext context) {
 
+    if (!initialized) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return GestureDetector(
-      onTap: toggle,
-      child: Container(
-        color: Colors.black,
-        width: double.infinity,
-        height: double.infinity,
-        child: Video(
-          controller: controller,
+      onTap: togglePause,
+      child: SizedBox.expand(
+        child: FittedBox(
           fit: BoxFit.cover,
+          child: SizedBox(
+            width: 1920,
+            height: 1080,
+            child: Video(
+              controller: controller,
+            ),
+          ),
         ),
       ),
     );
