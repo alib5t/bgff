@@ -12,20 +12,18 @@ class _VideoScreenState extends State<VideoScreen> {
 
   late final PageController controller;
 
+  int currentIndex = 0;
+
   final List<String> videos = List.generate(
     60,
     (i) => "assets/videos/${i + 1}.mp4",
   );
 
-  int currentIndex = 0;
-
   @override
   void initState() {
     super.initState();
 
-    controller = PageController(
-      initialPage: 0,
-    );
+    controller = PageController();
   }
 
   @override
@@ -40,24 +38,44 @@ class _VideoScreenState extends State<VideoScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
 
-      body: PageView.builder(
-        controller: controller,
-        scrollDirection: Axis.vertical,
-        itemCount: videos.length,
+      body: Stack(
+        children: [
 
-        onPageChanged: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-        },
+          PageView.builder(
+            controller: controller,
+            scrollDirection: Axis.vertical,
+            itemCount: videos.length,
 
-        itemBuilder: (context, index) {
+            onPageChanged: (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
 
-          return VideoItem(
-            path: videos[index],
-            isActive: currentIndex == index,
-          );
-        },
+            itemBuilder: (context, index) {
+
+              return VideoItem(
+                path: videos[index],
+                isActive: currentIndex == index,
+              );
+            },
+          ),
+
+          Positioned(
+            top: 50,
+            left: 15,
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
