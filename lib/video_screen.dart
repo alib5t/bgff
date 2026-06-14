@@ -45,7 +45,8 @@ class _VideoScreenState extends State<VideoScreen> {
             controller: controller,
             scrollDirection: Axis.vertical,
             itemCount: videos.length,
-
+            physics: const ClampingScrollPhysics(),
+            
             onPageChanged: (index) {
               setState(() {
                 currentIndex = index;
