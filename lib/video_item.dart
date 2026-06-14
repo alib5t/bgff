@@ -17,46 +17,29 @@ class VideoItem extends StatefulWidget {
 }
 
 class _VideoItemState extends State<VideoItem> {
-
   late final Player player;
   late final VideoController controller;
 
-  bool initialized = false;
+  bool paused = false;
 
   @override
   void initState() {
     super.initState();
 
     player = Player();
-
     controller = VideoController(player);
 
     player.open(
-      Media(widget.path),
-      play: false,
+      Media('asset://${widget.path}'),
+      play: widget.isActive,
     );
 
     player.setPlaylistMode(PlaylistMode.loop);
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-
-      if (!mounted) return;
-
-      setState(() {
-        initialized = true;
-      });
-
-      if (widget.isActive) {
-        player.play();
-      }
-    });
   }
 
   @override
   void didUpdateWidget(covariant VideoItem oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (!initialized) return;
 
     if (widget.isActive) {
       player.play();
@@ -66,11 +49,12 @@ class _VideoItemState extends State<VideoItem> {
   }
 
   void togglePause() {
-
     if (player.state.playing) {
       player.pause();
+      paused = true;
     } else {
       player.play();
+      paused = false;
     }
 
     setState(() {});
@@ -84,29 +68,25 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
-
-    if (!initialized) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return GestureDetector(
       onTap: togglePause,
-      child: SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: 1920,
-            height: 1080,
-            child: Video(
-              controller: controller,
-            ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Video(
+            controller: controller,
+            fit: BoxFit.cover,
           ),
-        ),
+
+          if (paused)
+            const Center(
+              child: Icon(
+                Icons.play_arrow,
+                size: 80,
+                color: Colors.white,
+              ),
+            ),
+        ],
       ),
     );
   }
